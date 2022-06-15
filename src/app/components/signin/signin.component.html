@@ -1,0 +1,47 @@
+<div class="row">
+    <div class="col-md-4 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                SignIn
+            </div>
+            <div class="card-body">
+                <form (submit)="signIn()">
+                    <div class="form-group">
+                        <input type="text" [(ngModel)]="user.username" name="username" class="form-control" placeholder="Email" required autofocus>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" [(ngModel)]="user.password" name="password" class="form-control" placeholder="Password" required>
+                    </div>
+                    <button class="btn btn-success btn-block">
+                        SignIn
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="card-header">
+            <app-allice-public-key [alliceKeys] = "alliceKeys"></app-allice-public-key >
+        </div>
+        <div class="body">
+            <app-hash-cegado [hashCegado]="hashCegado"></app-hash-cegado>
+        </div>
+        <div class="body">
+            <app-firma-ciega-upc [firma]="firma"></app-firma-ciega-upc>
+        </div>
+        <div class="body">
+            <app-identidad-anonima></app-identidad-anonima>
+        </div>
+        <div class="card-header">
+            <form (submit)="validator()">
+                <button class="btn btn-success btn-block">
+                    Validate
+                </button>
+            </form>
+        </div>
+        <div class="body">
+            <app-nonce-firmado [nonceFirmado]="nonceFirmado"></app-nonce-firmado>
+        </div>
+        <div class="body">
+            <app-veredicto [veredicto]="veredicto"></app-veredicto>
+        </div>
+    </div>
+</div>
