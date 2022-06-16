@@ -27,12 +27,12 @@ export class AuthService {
 
   }
 
-  sentToEvent(identidadAnonima: identidadAnonima){
-    return this.http.post<any>("http://localhost:80/" , identidadAnonima)
+  sentToEvent(identidadAnonima: any){
+    return this.http.post<any>("http://localhost:5000/accessToEvent" , identidadAnonima)
   }
   
-  sendNonceFirmado(nonceFirmado: bigint){
-    return this.http.post<any>("http://localhost:80/", nonceFirmado)
+  sendNonceFirmado(nonceFirmado: any){
+    return this.http.post<any>("http://localhost:5000/isValidAuthentication", nonceFirmado)
 
   }
 
