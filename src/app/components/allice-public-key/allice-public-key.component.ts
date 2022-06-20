@@ -7,7 +7,7 @@ import { rsaKeyPair, RsaPublicKey, generateKeys } from '../../models/clave-rsa';
   styleUrls: ['./allice-public-key.component.css']
 })
 export class AllicePublicKeyComponent implements OnInit {
-  @Input() alliceKeys: rsaKeyPair;
+  @Input() correctamenteLogeado: string;
   constructor() { }
 
   ngOnInit(): void {

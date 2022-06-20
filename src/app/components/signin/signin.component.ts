@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {AuthService} from '../../services/auth.service'
-import { rsaKeyPair, RsaPublicKey, generateKeys } from '../../models/clave-rsa';
+import { rsaKeyPair, RsaPublicKey, generateKeys, RsaPublicKeyDes } from '../../models/clave-rsa';
 import * as bigintConversion from 'bigint-conversion'
 import { ThisReceiver, ThrowStmt } from '@angular/compiler';
 import * as cryptojs from 'crypto-js';
@@ -21,12 +21,15 @@ export class SigninComponent implements OnInit {
   firmaDescegada: string;
   allicePublicKey: RsaPublicKey;
   alliceKeys: rsaKeyPair;
+  correctamenteLogeado: string;
   publice: string;
   publicn: string;
   signature: string;
   nonce:string;
+  comprobando: string = "0";
   nonceFirmado: string;
   veredicto: string;
+  numeroVeredicto: string;
   nonceFirmadoEnviar: any = {
     nonceEnviar: String
   }
@@ -54,45 +57,71 @@ export class SigninComponent implements OnInit {
   }
 
   async signIn() {
+    this.correctamenteLogeado= ""
     console.log(this.user)
-    this.authService.signin(this.user)
+    var result : any
+
+    result = await this.authService.signin(this.user)
     .subscribe(
       async res => {
         console.log(res)
         // recogemos la publicKey de la UPC,  (esto esta en duda) PREGUNTAR
+      
         this.upcPublicKey = new RsaPublicKey(bigintConversion.hexToBigint(res.eHex), bigintConversion.hexToBigint(res.nHex));
-        console.log("upcPublicKey " + this.upcPublicKey.e.toString())
-
+        await this.comprobando == "1"
+        console.log(" 1 esto que si esta bien " + this.comprobando)
+        
         // generamos la par de llaves de allice
         this.alliceKeys = await generateKeys(2048)
-        
+        this.allicePublicKey = this.alliceKeys.publicKey;
+        let descerealizacion : RsaPublicKeyDes = {
+            e: bigintConversion.bigintToHex(this.alliceKeys.publicKey.e),
+            n: bigintConversion.bigintToHex(this.alliceKeys.publicKey.n)
+        }
+
+        console.log("PUBLIC KEY ENVIADA DESDE LA UPC E : " + bigintConversion.bigintToHex( this.upcPublicKey.e))
+        console.log("PUBLIC KEY ENVIADA DESDE LA UPC N : " + bigintConversion.bigintToHex(this.upcPublicKey.n))
 
         // empezamos a cegar
-        const hashAllicePublicKey: string = cryptojs.SHA256(this.alliceKeys.publicKey).toString();
-        const hashCegadoBigint: bigint = this.authService.cegarRSA(bigintConversion.hexToBigint(hashAllicePublicKey), this.alliceKeys);
+        const hashAllicePublicKey: string = cryptojs.SHA256(JSON.stringify(descerealizacion)).toString();
+        console.log( " Estoo es el hash : " + hashAllicePublicKey)
+        const hashCegadoBigint: bigint = this.authService.cegarRSA(bigintConversion.hexToBigint(hashAllicePublicKey),this.upcPublicKey);
         this.hashCegado = bigintConversion.bigintToHex(hashCegadoBigint);
-        console.log("hash cegado" + this.hashCegado);
+        console.log("hash cegado: " + this.hashCegado);
         const enviar: HashAllice = {
           hashAlice: this.hashCegado
         }
         //creamos identidadAnonima
         this.authService.getUPCSignature(enviar).subscribe(
           async res => {
-            const firma: bigint = this.authService.descegarRSA(bigintConversion.hexToBigint(res.signature), this.alliceKeys);
+            const firmaDelServidor: any = res.signature
+            const firmaDelServidorHex: string = bigintConversion.bigintToHex(firmaDelServidor)
+            const firma: bigint = this.authService.descegarRSA(bigintConversion.hexToBigint(res.signature), this.upcPublicKey);
             this.firmaDescegada = bigintConversion.bigintToHex(firma)
             this.identidadAnonima.pubA = this.alliceKeys.publicKey;
             this.identidadAnonima.signature = this.firmaDescegada;
     
-            console.log(this.identidadAnonima.pubA.n + " esta es la pubA")
-            console.log(this.identidadAnonima.signature + " esta es la signature")
+            console.log(this.identidadAnonima.pubA.n + " iIDENTIDAD PUB.N")
+            console.log(this.identidadAnonima.pubA.e + " iIDENTIDAD PUB.E")
+            console.log(firmaDelServidor + " ESTA ES LA FIRMA ")
+            console.log(firmaDelServidorHex + " ESTA ES LA FIRMA PASADA A HEX")
+            console.log(this.firmaDescegada + " esta es la signature deshegada")
+
             
-
+            
           }
-
-
+          
         )
+        if( await (this.comprobando === "0")){
+          this.correctamenteLogeado = " CORRECTAMENTE LOGEADO" 
+         console.log("2 caso que no es correctamente logeado " + this.comprobando)
+        }
+      
       }
     )
+  
+    
+
   }
 
   async validator() {
@@ -112,11 +141,12 @@ export class SigninComponent implements OnInit {
         console.log(" nonce recibido firmado :" + this.nonceFirmado)
         await this.authService.sendNonceFirmado(this.nonceFirmadoEnviar).subscribe(
           async res => {
-            if (res.veredicto == "200")
-             {  
+            this.numeroVeredicto = res.veredicto;
+
+            if (this.numeroVeredicto === '200' ){
               this.veredicto = "Puede pasar!"
              }
-             this.veredicto = "no puedes pasar"
+            console.log("no quedo nada")
           }
         )
       }

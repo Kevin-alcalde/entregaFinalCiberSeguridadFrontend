@@ -37,6 +37,11 @@ export class RsaPublicKey {
     }
 }
 
+export interface RsaPublicKeyDes {
+    e: string,
+    n: string
+}
+
 export interface rsaKeyPair {
     publicKey: RsaPublicKey
     privateKey: RsaPrivateKey

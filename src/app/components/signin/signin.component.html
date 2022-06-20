@@ -15,17 +15,11 @@
                     <button class="btn btn-success btn-block">
                         SignIn
                     </button>
+                    <div class="card-header">
+                        <app-allice-public-key [correctamenteLogeado] = "correctamenteLogeado"></app-allice-public-key >
+                    </div>
                 </form>
             </div>
-        </div>
-        <div class="card-header">
-            <app-allice-public-key [alliceKeys] = "alliceKeys"></app-allice-public-key >
-        </div>
-        <div class="body">
-            <app-hash-cegado [hashCegado]="hashCegado"></app-hash-cegado>
-        </div>
-        <div class="body">
-            <app-firma-ciega-upc [firma]="firmaDescegada"></app-firma-ciega-upc>
         </div>
         <div class="body">
             <app-identidad-anonima></app-identidad-anonima>
@@ -36,9 +30,6 @@
                     Validate
                 </button>
             </form>
-        </div>
-        <div class="body">
-            <app-nonce-firmado [nonceFirmado]="nonceFirmado"></app-nonce-firmado>
         </div>
         <div class="body">
             <app-veredicto [veredicto]="veredicto"></app-veredicto>

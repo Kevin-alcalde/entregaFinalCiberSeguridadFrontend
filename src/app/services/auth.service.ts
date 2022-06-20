@@ -19,7 +19,12 @@ export class AuthService {
 
 
   signin(user: any) {
+    try {
     return this.http.post<any>(this.URL + '/login', user)
+    }
+    catch {
+      return null;
+    }
     }
 
   getUPCSignature(hasCegado: HashAllice){
@@ -41,14 +46,14 @@ export class AuthService {
 
   // crear mi par de llaves.
 
-    cegarRSA(digest: bigint, alliceKeys: rsaKeyPair): bigint{
-    const rCifrado: bigint = alliceKeys.publicKey.encrypt(this.r);
-    return bcu.toZn(digest*rCifrado, alliceKeys.publicKey.n)
+    cegarRSA(digest: bigint, alliceKeys: RsaPublicKey): bigint{
+    const rCifrado: bigint = alliceKeys.encrypt(this.r);
+    return bcu.toZn(digest*rCifrado, alliceKeys.n)
   }
 
-  descegarRSA(cegado: bigint, alliceKeys: rsaKeyPair): bigint {
-    const rInverso:bigint = bcu.modInv(this.r, alliceKeys.publicKey.n);
-    return bcu.toZn(cegado*rInverso, alliceKeys.publicKey.n)
+  descegarRSA(cegado: bigint, alliceKeys: RsaPublicKey): bigint {
+    const rInverso:bigint = bcu.modInv(this.r, alliceKeys.n);
+    return bcu.toZn(cegado*rInverso, alliceKeys.n)
   }
 
   
