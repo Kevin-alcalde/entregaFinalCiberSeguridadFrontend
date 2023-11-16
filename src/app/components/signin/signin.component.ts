@@ -83,8 +83,10 @@ export class SigninComponent implements OnInit {
         console.log("PUBLIC KEY ENVIADA DESDE LA UPC N : " + bigintConversion.bigintToHex(this.upcPublicKey.n))
 
         // empezamos a cegar
+        console.log( " Empiezo a cegar ");
         const hashAllicePublicKey: string = cryptojs.SHA256(JSON.stringify(descerealizacion)).toString();
-        console.log( " Estoo es el hash : " + hashAllicePublicKey)
+        console.log( " Estoo es el hash : " + hashAllicePublicKey);
+        console.log( " se va a usar el hash mas la publica de la UPC");
         const hashCegadoBigint: bigint = this.authService.cegarRSA(bigintConversion.hexToBigint(hashAllicePublicKey),this.upcPublicKey);
         this.hashCegado = bigintConversion.bigintToHex(hashCegadoBigint);
         console.log("hash cegado: " + this.hashCegado);
@@ -104,7 +106,6 @@ export class SigninComponent implements OnInit {
             console.log(this.identidadAnonima.pubA.n + " iIDENTIDAD PUB.N")
             console.log(this.identidadAnonima.pubA.e + " iIDENTIDAD PUB.E")
             console.log(firmaDelServidor + " ESTA ES LA FIRMA ")
-            console.log(firmaDelServidorHex + " ESTA ES LA FIRMA PASADA A HEX")
             console.log(this.firmaDescegada + " esta es la signature deshegada")
 
             
